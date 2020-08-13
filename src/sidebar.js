@@ -5,24 +5,27 @@ const CANCEL_DISTANCE_ON_SCROLL = 20;
 
 const defaultStyles = {
   root: {
-    position: "absolute",
+    position: "fixed",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    overflow: "hidden"
+    overflow: "hidden",
+    zIndex: 9990,
+    transition: "all .2s ease-out",
   },
   sidebar: {
-    zIndex: 2,
+    zIndex: 9992,
     position: "absolute",
     top: 0,
     bottom: 0,
-    transition: "transform .3s ease-out",
-    WebkitTransition: "-webkit-transform .3s ease-out",
+    transition: "transform .2s ease-out",
+    WebkitTransition: "-webkit-transform .2s ease-out",
     willChange: "transform",
-    overflowY: "auto"
+    overflowY: "auto",
+    backgroundColor: "white",
   },
-  content: {
+  overlayContent: {
     position: "absolute",
     top: 0,
     left: 0,
@@ -30,10 +33,10 @@ const defaultStyles = {
     bottom: 0,
     overflowY: "auto",
     WebkitOverflowScrolling: "touch",
-    transition: "left .3s ease-out, right .3s ease-out"
+    transition: "left .2s ease-out, right .2s ease-out",
   },
   overlay: {
-    zIndex: 1,
+    zIndex: 9991,
     position: "fixed",
     top: 0,
     left: 0,
@@ -41,11 +44,11 @@ const defaultStyles = {
     bottom: 0,
     opacity: 0,
     visibility: "hidden",
-    transition: "opacity .3s ease-out, visibility .3s ease-out",
+    transition: "opacity .2s ease-out, visibility .2s ease-out",
     backgroundColor: "rgba(0,0,0,.3)"
   },
   dragHandle: {
-    zIndex: 1,
+    zIndex: 9991,
     position: "fixed",
     top: 0,
     bottom: 0
@@ -235,9 +238,9 @@ class Sidebar extends Component {
       ...defaultStyles.sidebar,
       ...this.props.styles.sidebar
     };
-    const contentStyle = {
-      ...defaultStyles.content,
-      ...this.props.styles.content
+    const overlayContentStyle = {
+      ...defaultStyles.overlayContent,
+      ...this.props.styles.overlayContent
     };
     const overlayStyle = {
       ...defaultStyles.overlay,
@@ -247,7 +250,7 @@ class Sidebar extends Component {
     const isTouching = this.isTouching();
     const rootProps = {
       className: this.props.rootClassName,
-      style: { ...defaultStyles.root, ...this.props.styles.root },
+      style: { ...defaultStyles.root, ...this.props.styles.root, visibility: !this.props.open && "hidden" },
       role: "navigation",
       id: this.props.rootId
     };
@@ -297,9 +300,9 @@ class Sidebar extends Component {
 
       // make space on the left/right side of the content for the sidebar
       if (this.props.pullRight) {
-        contentStyle.right = `${this.state.sidebarWidth}px`;
+        overlayContentStyle.right = `${this.state.sidebarWidth}px`;
       } else {
-        contentStyle.left = `${this.state.sidebarWidth}px`;
+        overlayContentStyle.left = `${this.state.sidebarWidth}px`;
       }
     } else if (this.props.open) {
       // slide open sidebar
@@ -314,7 +317,7 @@ class Sidebar extends Component {
     if (isTouching || !this.props.transitions) {
       sidebarStyle.transition = "none";
       sidebarStyle.WebkitTransition = "none";
-      contentStyle.transition = "none";
+      overlayContentStyle.transition = "none";
       overlayStyle.transition = "none";
     }
 
@@ -351,6 +354,8 @@ class Sidebar extends Component {
       }
     }
 
+    document.body.style.overflow = this.props.open ? "hidden" : "initial"
+
     return (
       <div {...rootProps}>
         <div
@@ -359,7 +364,7 @@ class Sidebar extends Component {
           ref={this.saveSidebarRef}
           id={this.props.sidebarId}
         >
-          {this.props.sidebar}
+          {this.props.children}
         </div>
         {/* eslint-disable */}
         <div
@@ -370,12 +375,12 @@ class Sidebar extends Component {
         />
         {/* eslint-enable */}
         <div
-          className={this.props.contentClassName}
-          style={contentStyle}
-          id={this.props.contentId}
+          className={this.props.overlayContentClassName}
+          style={overlayContentStyle}
+          id={this.props.overlayContentId}
         >
           {dragHandle}
-          {this.props.children}
+          {this.props.overlayContent}
         </div>
       </div>
     );
@@ -383,14 +388,14 @@ class Sidebar extends Component {
 }
 
 Sidebar.propTypes = {
-  // main content to render
+  // main content to render in side bar
   children: PropTypes.node.isRequired,
 
   // styles
   styles: PropTypes.shape({
     root: PropTypes.object,
     sidebar: PropTypes.object,
-    content: PropTypes.object,
+    overlayContent: PropTypes.object,
     overlay: PropTypes.object,
     dragHandle: PropTypes.object
   }),
@@ -402,7 +407,7 @@ Sidebar.propTypes = {
   sidebarClassName: PropTypes.string,
 
   // content optional class
-  contentClassName: PropTypes.string,
+  overlayContentClassName: PropTypes.string,
 
   // overlay optional class
   overlayClassName: PropTypes.string,
@@ -447,7 +452,7 @@ Sidebar.propTypes = {
   sidebarId: PropTypes.string,
 
   // content optional id
-  contentId: PropTypes.string,
+  overlayContentId: PropTypes.string,
 
   // overlay optional id
   overlayId: PropTypes.string

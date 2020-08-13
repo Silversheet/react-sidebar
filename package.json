@@ -1,6 +1,6 @@
 {
-  "name": "react-sidebar",
-  "version": "3.0.2",
+  "name": "@silversheet/react-sidebar",
+  "version": "1.0.1",
   "author": "Paulus Schoutsen <Paulus@PaulusSchoutsen.nl>",
   "description": "A sidebar component for React.",
   "main": "dist/react-sidebar.cjs.js",
@@ -22,7 +22,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/balloob/react-sidebar.git"
+    "url": "git://github.com/silversheet/react-sidebar.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
   },
   "dependencies": {
     "@babel/runtime": ">=7.0.0-beta.56",
