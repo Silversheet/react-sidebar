@@ -1,15 +1,18 @@
-# React Sidebar [![npm version](https://badge.fury.io/js/react-sidebar.svg)](http://badge.fury.io/js/react-sidebar) [![Build Status](https://travis-ci.org/balloob/react-sidebar.svg)](https://travis-ci.org/balloob/react-sidebar)
+# React Sidebar
+
+### Disclaimer:
+This repo is a clone of the original [react-sidebar](https://www.npmjs.com/package/react-sidebar). Work was added on top to meet Silversheet's needs.
+
+---
 
 React Sidebar is a sidebar component for React 0.14+. It offers the following features:
 
 - The sidebar can slide over the main content or dock next to it.
 - Touch enabled: swipe to open and close the sidebar like on a native mobile app.
-- Easy to combine with media queries to show the sidebar only when there's enough screen-width ([see example](http://balloob.github.io/react-sidebar/example/responsive_example.html)).
+- Easy to combine with media queries to show the sidebar only when there's enough screen-width.
 - Works on both the left and right side.
 - Tiny size: <2.5kB gzipped
 - MIT license
-
-[See a demo here.](http://balloob.github.io/react-sidebar/example/)
 
 ## Touch specifics
 
@@ -57,14 +60,16 @@ class App extends React.Component {
   render() {
     return (
       <Sidebar
-        sidebar={<b>Sidebar content</b>}
+        overlayContent={(
+          <button onClick={() => this.onSetSidebarOpen(true)}>
+            Open sidebar
+          </button>
+        )}
         open={this.state.sidebarOpen}
         onSetOpen={this.onSetSidebarOpen}
         styles={{ sidebar: { background: "white" } }}
       >
-        <button onClick={() => this.onSetSidebarOpen(true)}>
-          Open sidebar
-        </button>
+        <b>Sidebar content</b>
       </Sidebar>
     );
   }
@@ -116,12 +121,12 @@ class App extends React.Component {
   render() {
     return (
       <Sidebar
-        sidebar={<b>Sidebar content</b>}
+        overlayContent={<b>Overlay content</b>}
         open={this.state.sidebarOpen}
         docked={this.state.sidebarDocked}
         onSetOpen={this.onSetSidebarOpen}
       >
-        <b>Main content</b>
+        <b>Main sidebar content</b>
       </Sidebar>
     );
   }
@@ -134,13 +139,13 @@ export default App;
 
 | Property name      | Type                      | Default              | Description                                                                                                                                                              |
 | ------------------ | ------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| children           | Anything React can render | n/a                  | The main content                                                                                                                                                         |
+| children           | Anything React can render | n/a                  | The sidebar content                                                                                                                                                         |
 | rootClassName      | string                    | n/a                  | Add a custom class to the root component                                                                                                                                 |
 | sidebarClassName   | string                    | n/a                  | Add a custom class to the sidebar                                                                                                                                        |
-| contentClassName   | string                    | n/a                  | Add a custom class to the content                                                                                                                                        |
+| overlayContentClassName   | string                    | n/a                  | Add a custom class to the overlay content                                                                                                                                        |
 | overlayClassName   | string                    | n/a                  | Add a custom class to the overlay                                                                                                                                        |
 | defaultSidebarWidth   | number                 | 0                    | Width in pixles of the sidebar on render. Use this to stop the sidebar from poping in after intial render. (Overrides transitions)                                      |
-| sidebar            | Anything React can render | n/a                  | The sidebar content                                                                                                                                                      |
+| overlayContent            | Anything React can render | n/a                  | The overlay conten                                                                                                                                                      |
 | onSetOpen          | function                  | n/a                  | Callback called when the sidebar wants to change the open prop. Happens after sliding the sidebar and when the overlay is clicked when the sidebar is open.              |
 | docked             | boolean                   | false                | If the sidebar should be always visible                                                                                                                                  |
 | open               | boolean                   | false                | If the sidebar should be open                                                                                                                                            |
@@ -158,29 +163,32 @@ export default App;
 
 ## Styles
 
-Styles are passed as an object with 5 keys, `root`, `sidebar`, `content`, `overlay` and `dragHandle`, and merged to the following defaults:
+Styles are passed as an object with 5 keys, `root`, `sidebar`, `overlayContent`, `overlay` and `dragHandle`, and merged to the following defaults:
 
 ```javascript
 {
   root: {
-    position: "absolute",
+    position: "fixed",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    overflow: "hidden"
+    overflow: "hidden",
+    zIndex: 9990,
+    transition: "all .2s ease-out",
   },
   sidebar: {
-    zIndex: 2,
+    zIndex: 9992,
     position: "absolute",
     top: 0,
     bottom: 0,
-    transition: "transform .3s ease-out",
-    WebkitTransition: "-webkit-transform .3s ease-out",
+    transition: "transform .2s ease-out",
+    WebkitTransition: "-webkit-transform .2s ease-out",
     willChange: "transform",
-    overflowY: "auto"
+    overflowY: "auto",
+    backgroundColor: "white",
   },
-  content: {
+  overlayContent: {
     position: "absolute",
     top: 0,
     left: 0,
@@ -188,10 +196,10 @@ Styles are passed as an object with 5 keys, `root`, `sidebar`, `content`, `overl
     bottom: 0,
     overflowY: "auto",
     WebkitOverflowScrolling: "touch",
-    transition: "left .3s ease-out, right .3s ease-out"
+    transition: "left .2s ease-out, right .2s ease-out",
   },
   overlay: {
-    zIndex: 1,
+    zIndex: 9991,
     position: "fixed",
     top: 0,
     left: 0,
@@ -199,18 +207,14 @@ Styles are passed as an object with 5 keys, `root`, `sidebar`, `content`, `overl
     bottom: 0,
     opacity: 0,
     visibility: "hidden",
-    transition: "opacity .3s ease-out, visibility .3s ease-out",
+    transition: "opacity .2s ease-out, visibility .2s ease-out",
     backgroundColor: "rgba(0,0,0,.3)"
   },
   dragHandle: {
-    zIndex: 1,
+    zIndex: 9991,
     position: "fixed",
     top: 0,
     bottom: 0
   }
 };
 ```
-
-## Acknowledgements
-
-My goal was to make a React Component that implements the [material design spec for navigation drawers](https://material.io/design/components/navigation-drawer.html). My initial attempt was to improve [hamburger-basement by arnemart](https://github.com/arnemart/hamburger-basement) but I quickly figured that I better start from scratch. Still, that project helped me a ton to get started.
