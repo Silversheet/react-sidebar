@@ -1,6 +1,6 @@
 {
   "name": "@silversheet/react-sidebar",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "author": "Paulus Schoutsen <Paulus@PaulusSchoutsen.nl>",
   "description": "A sidebar component for React.",
   "main": "dist/react-sidebar.cjs.js",
